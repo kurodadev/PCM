@@ -1,0 +1,150 @@
+=====================================
+BACKUP DO CHAT - PROJETO PCM (15/01/2025)
+=====================================
+
+RESUMO DA SESSÃO
+---------------
+
+1. OBJETIVOS ALCANÇADOS
+-----------------------
+* Criação da estrutura base do projeto PCM
+* Organização da documentação inicial
+* Estruturação completa de pastas
+
+2. DOCUMENTAÇÃO CRIADA
+----------------------
+* GUIDELINES.md - Diretrizes do projeto
+* PROJECT_STRUCTURE.md - Estrutura de pastas
+* DATABASE_STRUCTURE.md - Estrutura do banco de dados
+
+3. ESTRUTURA DE PASTAS CRIADA
+----------------------------
+
+FRONTEND:
+---------
+/frontend
+    /src
+        /app
+        /assets
+            /fonts
+            /icons
+            /images
+        /components
+            /common
+            /forms
+            /layout
+            /ui
+        /features
+            /auth
+            /dashboard
+            /equipment
+            /maintenance
+            /reports
+            /notifications
+        /hooks
+            /api
+            /auth
+            /common
+        /lib
+            /api
+            /constants
+            /utils
+        /services
+            /api
+            /auth
+            /storage
+        /store
+            /slices
+            /hooks
+        /styles
+            /global
+            /themes
+            /variables
+        /types
+            /api
+            /models
+            /common
+        /utils
+            /formatters
+            /validators
+            /helpers
+    /public
+
+BACKEND:
+--------
+/backend
+    /src
+        /config
+        /modules
+            /equipment
+                /controllers
+                /services
+                /repositories
+                /routes
+                /models
+            /maintenance
+                /controllers
+                /services
+                /repositories
+                /routes
+                /models
+            /users
+                /controllers
+                /services
+                /repositories
+                /routes
+                /models
+        /shared
+            /middlewares
+            /errors
+            /utils
+            /infra
+                /database
+                /http
+        /types
+            /express
+            /models
+    /prisma
+        /migrations
+        /seed
+            /data
+    /tests
+        /integration
+        /unit
+        /fixtures
+    /docs
+        /api
+        /database
+    /scripts
+        /migrations
+        /seeds
+    /logs
+
+4. PRÓXIMOS PASSOS PLANEJADOS
+-----------------------------
+1. Configuração do ambiente de desenvolvimento
+2. Setup do backend:
+   - Node.js
+   - TypeScript
+   - Docker/PostgreSQL
+3. Setup do frontend:
+   - React
+   - TypeScript
+
+5. DECISÕES TÉCNICAS
+-------------------
+* Docker para PostgreSQL (recomendado para facilitar implantação)
+* Node.js versão LTS mais recente (20.x)
+* Estrutura modular para melhor organização
+* Separação clara entre frontend e backend
+
+6. OBSERVAÇÕES IMPORTANTES
+-------------------------
+* Estrutura criada seguindo melhores práticas
+* Arquivos .gitkeep adicionados para controle de versão
+* Documentação completa na pasta _docs
+* README.md mantido como referência das tecnologias
+
+=====================================
+FIM DO BACKUP
+=====================================
