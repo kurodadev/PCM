@@ -1,20 +1,16 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { MainLayout } from './components/layout/MainLayout';
-import { AppRoutes } from './routes';
-import { theme } from './styles/theme';
+import { Box, Typography } from '@mui/material';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <MainLayout>
-          <AppRoutes />
-        </MainLayout>
-      </BrowserRouter>
-    </ThemeProvider>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4">
+        PCM - Planejamento e Controle de Manutenção
+      </Typography>
+      <Typography variant="body1" sx={{ mt: 2 }}>
+        Bem-vindo ao sistema!
+      </Typography>
+    </Box>
   );
 }
 
