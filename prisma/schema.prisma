@@ -31,6 +31,9 @@ model Equipment {
   sectorId        String?
   operators       EquipmentOperator[]
   workOrders      WorkOrder[]
+  documents       TechnicalDocument[]
+  spareParts      SparePart[]
+  indicators      MaintenanceIndicator[]
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -56,6 +59,7 @@ model User {
   active      Boolean   @default(true)
   workOrders  WorkOrder[]
   equipments  EquipmentOperator[]
+  maintenanceHistory MaintenanceHistory[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -100,7 +104,8 @@ model WorkOrder {
   maintenanceAreaId String
   status            Status             @relation(fields: [statusId], references: [id])
   statusId          String
-
+  history           MaintenanceHistory[]
+  
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -147,4 +152,63 @@ model Status {
   updatedAt   DateTime    @updatedAt
 
   @@map("status")
+}
+
+model MaintenanceHistory {
+  id          String    @id @default(uuid())
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId String
+  status      Status    @relation(fields: [statusId], references: [id])
+  statusId    String
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  observations String?
+  createdAt   DateTime  @default(now())
+
+  @@map("maintenance_history")
+}
+
+model TechnicalDocument {
+  id          String    @id @default(uuid())
+  title       String
+  type        String    // Manual, Desenho, Certificado, etc
+  fileUrl     String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  equipmentId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("technical_documents")
+}
+
+model SparePart {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  name        String
+  description String?
+  minStock    Int       @default(0)
+  currentStock Int      @default(0)
+  unitCost    Float
+  location    String?   // Localização no almoxarifado
+  equipment   Equipment[] // Equipamentos que usam esta peça
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("spare_parts")
+}
+
+model MaintenanceIndicator {
+  id              String    @id @default(uuid())
+  equipmentId     String
+  equipment       Equipment @relation(fields: [equipmentId], references: [id])
+  mtbf            Float?    // Mean Time Between Failures (horas)
+  mttr            Float?    // Mean Time To Repair (horas)
+  availability    Float?    // Disponibilidade (%)
+  reliability     Float?    // Confiabilidade (%)
+  oee             Float?    // Overall Equipment Effectiveness (%)
+  period          DateTime  // Período de referência
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("maintenance_indicators")
 }
