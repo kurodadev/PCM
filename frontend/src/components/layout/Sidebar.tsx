@@ -11,23 +11,19 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  Build as BuildIcon,
   Assignment as AssignmentIcon,
-  People as PeopleIcon,
-  Settings as SettingsIcon,
   Inventory as InventoryIcon,
-  Description as DocumentIcon,
+  TrendingUp as TrendingUpIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { text: 'Equipamentos', icon: <BuildIcon />, path: '/equipamentos' },
-  { text: 'Ordens de Serviço', icon: <AssignmentIcon />, path: '/ordens-servico' },
-  { text: 'Funcionários', icon: <PeopleIcon />, path: '/funcionarios' },
-  { text: 'Peças', icon: <InventoryIcon />, path: '/pecas' },
-  { text: 'Documentos', icon: <DocumentIcon />, path: '/documentos' },
+  { text: 'Ordem de Serviços', icon: <AssignmentIcon />, path: '/ordens-servico' },
+  { text: 'Inventário', icon: <InventoryIcon />, path: '/inventario' },
+  { text: 'Análise de Custo', icon: <TrendingUpIcon />, path: '/analise-custo' },
   { text: 'Configurações', icon: <SettingsIcon />, path: '/configuracoes' },
 ];
 
