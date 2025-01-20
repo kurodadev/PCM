@@ -1,16 +1,20 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { BrowserRouter } from 'react-router-dom';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { Routes } from './routes/Routes';
 
 function App() {
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4">
-        PCM - Planejamento e Controle de Manutenção
-      </Typography>
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        Bem-vindo ao sistema!
-      </Typography>
-    </Box>
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <CssBaseline />
+          <Routes />
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
