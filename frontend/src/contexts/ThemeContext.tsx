@@ -1,14 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material';
+import { ThemeProvider as MuiThemeProvider, createTheme, Theme } from '@mui/material/styles';
 
-type ThemeContextType = {
+interface ThemeContextType {
   isDarkMode: boolean;
   toggleTheme: () => void;
-};
+  theme: Theme;
+}
 
 const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
   toggleTheme: () => {},
+  theme: createTheme(),
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -67,7 +69,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme, theme }}>
       <MuiThemeProvider theme={theme}>
         {children}
       </MuiThemeProvider>
