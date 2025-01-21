@@ -15,6 +15,7 @@ Erro específico: "Module not found" para estes componentes
   - Contextos em `src/contexts/`
   - Rotas em `src/routes/`
 - Remover quaisquer arquivos duplicados
+- Garantir que não há conflitos de nome
 
 ### 2. Arquivos Afetados
 - `src/App.tsx`
@@ -42,3 +43,9 @@ import ... from './routes/Routes'
    - Troca de tema (claro/escuro)
    - Autenticação
    - Navegação entre rotas
+
+## Observações Importantes
+- Certifique-se de que o TypeScript está configurado corretamente
+- Verifique se todas as dependências estão instaladas
+- Execute `npm install` após clonar o repositório
+- Em caso de problemas, limpe o cache: `npm cache clean --force`
