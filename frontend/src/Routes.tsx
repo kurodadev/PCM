@@ -11,7 +11,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
-export const Routes = () => {
+const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/login" element={<Login />} />
@@ -77,3 +77,5 @@ export const Routes = () => {
     </RouterRoutes>
   );
 };
+
+export default Routes;
