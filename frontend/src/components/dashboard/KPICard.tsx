@@ -1,81 +1,69 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box } from '@mui/material';
-import { SvgIconComponent } from '@mui/icons-material';
+import { Paper, Typography, Box } from '@mui/material';
 
 interface KPICardProps {
   title: string;
   value: string | number;
-  icon: React.ReactElement<SvgIconComponent>;
-  color: string;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
+  icon: React.ReactElement;
+  color?: string;
 }
 
 export const KPICard: React.FC<KPICardProps> = ({
   title,
   value,
   icon,
-  color,
-  trend,
+  color = '#1976d2',
 }) => {
   return (
-    <Card
+    <Paper
+      elevation={2}
       sx={{
-        minWidth: 200,
+        p: 2,
         height: '100%',
-        backgroundColor: 'background.paper',
-        '&:hover': {
-          boxShadow: 6,
-          transform: 'translateY(-2px)',
-          transition: 'all 0.3s',
-        },
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <CardContent>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: -10,
+          right: -10,
+          opacity: 0.1,
+          transform: 'scale(2)',
+        }}
+      >
+        {React.cloneElement(icon, { style: { fontSize: 100, color } })}
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 1,
+        }}
+      >
         <Box
           sx={{
+            backgroundColor: `${color}20`,
+            borderRadius: '50%',
+            p: 1,
+            mr: 1,
             display: 'flex',
             alignItems: 'center',
-            mb: 2,
+            justifyContent: 'center',
           }}
         >
-          <Box
-            sx={{
-              backgroundColor: `${color}15`,
-              borderRadius: '50%',
-              p: 1,
-              mr: 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {React.cloneElement(icon, { sx: { color } })}
-          </Box>
-          <Typography variant="subtitle2" color="text.secondary">
-            {title}
-          </Typography>
+          {React.cloneElement(icon, { style: { color } })}
         </Box>
-        <Typography variant="h4" component="div" sx={{ mb: 1 }}>
-          {value}
+        <Typography variant="subtitle2" color="text.secondary">
+          {title}
         </Typography>
-        {trend && (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography
-              variant="body2"
-              color={trend.isPositive ? 'success.main' : 'error.main'}
-              sx={{ display: 'flex', alignItems: 'center' }}
-            >
-              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-              vs último mês
-            </Typography>
-          </Box>
-        )}
-      </CardContent>
-    </Card>
+      </Box>
+      <Typography variant="h4" component="div" sx={{ fontWeight: 'medium' }}>
+        {value}
+      </Typography>
+    </Paper>
   );
 };
