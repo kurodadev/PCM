@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -8,50 +8,113 @@ import {
   Avatar,
   Badge,
   Stack,
+  useMediaQuery,
 } from '@mui/material';
-import { NotificationsActive } from '@mui/icons-material';
+import {
+  NotificationsActive,
+  Brightness4,
+  Brightness7,
+  Menu as MenuIcon,
+} from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { UserMenu } from './UserMenu';
+import { useAppTheme } from '../../contexts/ThemeContext';
 
-export const Header = () => {
+interface HeaderProps {
+  onToggleTheme: () => void;
+  isDarkMode: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onToggleTheme, isDarkMode }) => {
   const { user } = useAuth();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { theme } = useAppTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <AppBar 
       position="fixed" 
       sx={{ 
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: '#1a237e', // Tom mais escuro de azul
+        zIndex: theme.zIndex.drawer + 1,
+        bgcolor: theme.palette.primary.main,
       }}
     >
       <Toolbar>
-        {/* Logo área */}
-        <Box sx={{ width: 200, mr: 3 }}>
-          <Typography variant="h6" noWrap component="div" sx={{ color: '#fff' }}>
-            RESIPLAC
-          </Typography>
-        </Box>
+        {isMobile && (
+          <IconButton
+            color="inherit"
+            edge="start"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
 
-        {/* Área central - pode ser usada para título da página ou outros elementos */}
-        <Box sx={{ flexGrow: 1 }} />
+        <Box
+          component="img"
+          src="/logo.svg"
+          alt="PCM Logo"
+          sx={{
+            height: 40,
+            width: 'auto',
+            mr: 2,
+            filter: isDarkMode ? 'brightness(1)' : 'none',
+          }}
+        />
 
-        {/* Área direita com notificações e perfil */}
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Typography 
+          variant="h6" 
+          component="div" 
+          sx={{ 
+            flexGrow: 1,
+            color: theme.palette.primary.contrastText,
+          }}
+        >
+          Sistema PCM
+        </Typography>
+
+        <Stack direction="row" spacing={1} alignItems="center">
           <IconButton color="inherit">
-            <Badge badgeContent={3} color="error">
+            <Badge badgeContent={4} color="error">
               <NotificationsActive />
             </Badge>
           </IconButton>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" sx={{ color: '#fff' }}>
-              {user?.name || 'Usuário'}
-            </Typography>
-            <Avatar
-              alt={user?.name || 'User Avatar'}
-              src="/path-to-avatar.jpg" // Adicione o caminho para a foto do usuário
-              sx={{ width: 40, height: 40 }}
+
+          <IconButton onClick={onToggleTheme} color="inherit">
+            {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+          </IconButton>
+
+          <IconButton 
+            onClick={handleOpenUserMenu} 
+            sx={{ 
+              p: 0,
+              ml: 1,
+              border: `2px solid ${theme.palette.primary.contrastText}`,
+            }}
+          >
+            <Avatar 
+              alt={user?.name || 'User'} 
+              src={user?.avatar}
+              sx={{ 
+                width: 32, 
+                height: 32,
+              }}
             />
-          </Box>
+          </IconButton>
+
+          <UserMenu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleCloseUserMenu}
+          />
         </Stack>
       </Toolbar>
     </AppBar>

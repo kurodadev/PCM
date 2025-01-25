@@ -5,6 +5,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  avatar?: string;
 }
 
 interface AuthContextType {
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: 'Usuário Teste',
         email: email,
         role: 'admin',
+        avatar: 'https://via.placeholder.com/150',
       };
       
       setUser(mockUser);

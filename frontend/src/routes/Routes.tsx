@@ -3,15 +3,12 @@ import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { Login } from '../pages/Login';
 import { MainLayout } from '../components/layout/MainLayout';
 import { useAuth } from '../contexts/AuthContext';
+import { Dashboard } from '../pages/Dashboard';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
-
-const Dashboard = () => (
-  <div>Dashboard em construção</div>
-);
 
 const WorkOrders = () => (
   <div>Ordens de Serviço em construção</div>
@@ -49,11 +46,44 @@ export const Routes = () => {
       />
 
       <Route
+        path="/solicitacoes"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <div>Solicitações em construção</div>
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/planos"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <div>Planos em construção</div>
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="/inventario"
         element={
           <PrivateRoute>
             <MainLayout>
               <Inventory />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/metricas"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <div>Métricas em construção</div>
             </MainLayout>
           </PrivateRoute>
         }
