@@ -16,10 +16,6 @@ import {
   Engineering as EngineeringIcon,
   PendingActions as PendingIcon,
   Timeline as TimelineIcon,
-  Construction as ConstructionIcon,
-  Settings as SettingsIcon,
-  PlayCircleOutline as InProgressIcon,
-  Info as InfoIcon,
 } from '@mui/icons-material';
 import { useAppTheme } from '../contexts/ThemeContext';
 import { CostByEquipmentChart } from '../components/charts/CostByEquipmentChart';
@@ -152,10 +148,30 @@ export const Dashboard = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        {/* Coluna Esquerda - Cards de Métricas */}
-        <Grid item xs={12} md={7}>
+        {/* Cards de Métricas */}
+        <Grid item xs={12}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Equipamentos"
+                value="156"
+                icon={<BuildIcon />}
+                subtitle="Total de equipamentos"
+                info="Número total de equipamentos cadastrados no sistema"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="OS em Andamento"
+                value="28"
+                icon={<AssignmentIcon />}
+                subtitle="Ordens de serviço ativas"
+                info="Número de ordens de serviço em execução"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
               <MetricCard
                 title="MTBF"
                 value="120h"
@@ -165,61 +181,51 @@ export const Dashboard = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} md={4}>
               <MetricCard
-                title="OS Sem Conclusão"
-                value="42"
-                icon={<PendingIcon />}
-                subtitle="Total de ordens abertas"
-                info="Número total de ordens de serviço que ainda não foram concluídas"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <MetricCard
-                title="Preditivas"
-                value="15"
-                icon={<TimelineIcon />}
-                subtitle="Manutenções preditivas"
-                info="Número de manutenções preditivas programadas para o mês"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <MetricCard
-                title="Corretivas"
-                value="28"
-                icon={<ConstructionIcon />}
-                subtitle="Manutenções corretivas"
-                info="Número de manutenções corretivas realizadas no mês"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <MetricCard
-                title="Preventivas"
-                value="35"
-                icon={<SettingsIcon />}
-                subtitle="Manutenções preventivas"
-                info="Número de manutenções preventivas programadas para o mês"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <MetricCard
-                title="Em Andamento"
+                title="Técnicos Disponíveis"
                 value="12"
-                icon={<InProgressIcon />}
-                subtitle="OS em execução"
-                info="Número de ordens de serviço atualmente em execução"
+                icon={<EngineeringIcon />}
+                subtitle="Equipe técnica ativa"
+                info="Número de técnicos disponíveis para manutenção"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Manutenções Pendentes"
+                value="15"
+                icon={<PendingIcon />}
+                subtitle="Aguardando execução"
+                info="Número de manutenções programadas aguardando execução"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Eficiência Geral"
+                value="85%"
+                icon={<TimelineIcon />}
+                progress={85}
+                subtitle="OEE do mês atual"
+                info="Overall Equipment Effectiveness - Eficiência geral dos equipamentos"
               />
             </Grid>
           </Grid>
         </Grid>
 
-        {/* Coluna Direita - Gráfico de Custos */}
-        <Grid item xs={12} md={5}>
-          <CostByEquipmentChart />
+        {/* Gráfico de Custos */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" component="h2" gutterBottom>
+                Custos por Equipamento
+              </Typography>
+              <Box sx={{ height: 300 }}>
+                <CostByEquipmentChart />
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     </Box>
