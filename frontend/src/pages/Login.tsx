@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Box,
+  Container,
   Paper,
   TextField,
   Button,
   Typography,
-  Container,
+  Box,
   Alert,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,8 +14,7 @@ import { useNavigate } from 'react-router-dom';
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, error } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +23,7 @@ export const Login = () => {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      setError('Email ou senha inválidos');
+      // Erro já é tratado no AuthContext
     }
   };
 
@@ -48,17 +47,15 @@ export const Login = () => {
             width: '100%',
           }}
         >
-          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-            PCM - Login
+          <Typography component="h1" variant="h5">
+            Login
           </Typography>
-
-          {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
             <TextField
               margin="normal"
               required

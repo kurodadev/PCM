@@ -1,9 +1,7 @@
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from './ThemeContext';
-import { AuthProvider } from './AuthContext';
-import Routes from './Routes';
+import { ThemeProvider, AuthProvider } from './contexts';
+import { Routes } from './routes/Routes';
 
 function App() {
   return (

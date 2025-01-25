@@ -1,77 +1,50 @@
-# PCM Frontend
+# React + TypeScript + Vite
 
-## Configuração do Ambiente de Desenvolvimento
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-### Requisitos
-- Node.js >= 14.0.0
-- npm >= 6.14.0
+Currently, two official plugins are available:
 
-### Dependências Principais
-- React 18.2.0
-- Material-UI 5.15.5
-- TypeScript 4.9.5
-- React Router DOM 6.21.3
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### Configuração do Editor
-Recomendamos usar o Visual Studio Code com as seguintes extensões:
-- ESLint
-- Prettier
-- TypeScript and JavaScript Language Features
-- Material Icon Theme
+## Expanding the ESLint configuration
 
-### Scripts Disponíveis
-```bash
-# Instalar dependências
-npm install
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-# Iniciar servidor de desenvolvimento
-npm start
+- Configure the top-level `parserOptions` property like this:
 
-# Criar build de produção
-npm run build
-
-# Executar testes
-npm test
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
 
-### Estrutura do Projeto
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
+
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
 ```
-frontend/
-  ├── public/
-  │   └── index.html
-  ├── src/
-  │   ├── components/
-  │   │   └── layout/
-  │   ├── contexts/
-  │   │   ├── ThemeContext.tsx
-  │   │   └── AuthContext.tsx
-  │   ├── pages/
-  │   ├── routes/
-  │   ├── App.tsx
-  │   └── index.tsx
-  └── package.json
-```
-
-### Solução de Problemas Comuns
-
-#### Erro do Webpack
-Se encontrar erro relacionado ao html-webpack-plugin:
-1. Remover node_modules e package-lock.json
-2. Limpar cache do npm
-3. Reinstalar dependências
-
-```powershell
-Remove-Item -Path node_modules -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
-npm cache clean --force
-npm install
-```
-
-#### Quirks Mode
-Se o navegador mostrar warning sobre Quirks Mode:
-1. Verificar se o DOCTYPE está correto no public/index.html
-2. Garantir que não há caracteres ou espaços antes do DOCTYPE
-
-### Backup e Versionamento
-- Backups das alterações são mantidos em `BACKUP_[DATA].md`
-- Último backup: BACKUP_2025_01_19.md
