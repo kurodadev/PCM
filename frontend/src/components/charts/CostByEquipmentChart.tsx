@@ -6,9 +6,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useAppTheme } from '../../contexts/ThemeContext';
 import inventoryData from '../../data/inventory.json';
 
