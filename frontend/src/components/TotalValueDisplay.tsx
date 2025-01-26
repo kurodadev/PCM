@@ -1,13 +1,25 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { AttachMoney as MoneyIcon } from '@mui/icons-material';
 
 interface TotalValueDisplayProps {
-  month: string;
   value: number;
+  label?: string;
 }
 
-export const TotalValueDisplay: React.FC<TotalValueDisplayProps> = ({ month, value }) => {
+// Formatar valor em Real Brasileiro
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
+export const TotalValueDisplay: React.FC<TotalValueDisplayProps> = ({ 
+  value,
+  label = 'Total'
+}) => {
   return (
     <Box 
       sx={{ 
@@ -15,23 +27,17 @@ export const TotalValueDisplay: React.FC<TotalValueDisplayProps> = ({ month, val
         alignItems: 'center',
         bgcolor: 'success.main',
         color: 'white',
-        py: 0.5,
         px: 2,
+        py: 1,
         borderRadius: 1,
-        boxShadow: 1,
-        alignSelf: 'flex-end',
-        mb: 2
       }}
     >
-      <MoneyIcon sx={{ mr: 1, fontSize: '1.2rem' }} />
-      <Box>
-        <Typography variant="caption" sx={{ opacity: 0.9 }}>
-          Total em {month}
-        </Typography>
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
-          R$ {value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </Typography>
-      </Box>
+      <Typography variant="caption" sx={{ mr: 1 }}>
+        {label}:
+      </Typography>
+      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+        {formatCurrency(value)}
+      </Typography>
     </Box>
   );
 };

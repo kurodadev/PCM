@@ -102,7 +102,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleTheme, isDarkMode }) => 
               sx={{ 
                 width: 32, 
                 height: 32,
-                bgcolor: theme.palette.secondary.main,
               }}
             >
               {user?.name?.charAt(0) || 'U'}
@@ -120,6 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleTheme, isDarkMode }) => 
 
         <UserMenu
           anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
           onClose={handleCloseUserMenu}
         />
       </Toolbar>

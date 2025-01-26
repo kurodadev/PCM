@@ -1,278 +1,191 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
   Box,
-  LinearProgress,
-  IconButton,
-  Tooltip,
+  Grid,
+  Paper,
+  Typography,
 } from '@mui/material';
 import {
-  Build as BuildIcon,
-  Assignment as AssignmentIcon,
-  Timer as TimerIcon,
+  MonetizationOn as MonetizationOnIcon,
   Engineering as EngineeringIcon,
-  PendingActions as PendingIcon,
-  Timeline as TimelineIcon,
-  Info as InfoIcon,
   Speed as SpeedIcon,
+  Timeline as TimelineIcon,
   Update as UpdateIcon,
+  Pending as PendingIcon,
 } from '@mui/icons-material';
-import { useAppTheme } from '../contexts/ThemeContext';
-import { CostByEquipmentChart } from '../components/charts/CostByEquipmentChart';
+import { MetricCard } from '../components/MetricCard';
 import { MaintenanceFilter } from '../components/filters/MaintenanceFilter';
+import inventory from '../data/inventory.json';
 
-interface MetricCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  progress?: number;
-  subtitle?: string;
-  info?: string;
+interface Equipment {
+  code: string;
+  name: string;
+  type: string;
+  power: number | null;
+  sector: string;
+  manufacturingYear: number;
+  energyCostPerHour: number | null;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, icon, progress, subtitle, info }) => {
-  const { isDarkMode } = useAppTheme();
-
-  return (
-    <Card
-      sx={{
-        height: '100%',
-        backgroundColor: isDarkMode ? 'background.paper' : 'background.paper',
-        boxShadow: isDarkMode 
-          ? '0 4px 6px rgba(0, 0, 0, 0.3)' 
-          : '0 2px 4px rgba(0, 0, 0, 0.1)',
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: isDarkMode 
-            ? '0 6px 12px rgba(0, 0, 0, 0.4)' 
-            : '0 4px 8px rgba(0, 0, 0, 0.15)',
-        },
-      }}
-    >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              backgroundColor: isDarkMode ? 'rgba(144, 202, 249, 0.2)' : 'primary.light',
-              color: isDarkMode ? 'primary.light' : 'primary.dark',
-              mr: 1.5,
-            }}
-          >
-            {icon}
-          </Box>
-          <Typography 
-            variant="h6" 
-            component="div" 
-            sx={{ 
-              flexGrow: 1,
-              fontSize: '0.9rem',
-              fontWeight: 500,
-            }}
-          >
-            {title}
-          </Typography>
-          {info && (
-            <Tooltip title={info}>
-              <IconButton size="small">
-                <InfoIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-        
-        <Typography 
-          variant="h4" 
-          component="div"
-          sx={{ 
-            mb: 0.5,
-            fontWeight: 600,
-            color: isDarkMode ? 'primary.light' : 'primary.main',
-            fontSize: '1.75rem',
-          }}
-        >
-          {value}
-        </Typography>
-        
-        {subtitle && (
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ 
-              mb: 0.5,
-              fontSize: '0.8rem',
-            }}
-          >
-            {subtitle}
-          </Typography>
-        )}
-
-        {progress !== undefined && (
-          <Box sx={{ width: '100%', mt: 1.5 }}>
-            <LinearProgress 
-              variant="determinate" 
-              value={progress} 
-              sx={{
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 3,
-                },
-              }}
-            />
-          </Box>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
 export const Dashboard = () => {
-  const [selectedFilters, setSelectedFilters] = React.useState({
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
+  const [selectedFilters, setSelectedFilters] = useState({
     equipment1: '',
     equipment2: '',
     equipment3: '',
-    area: ''
   });
+  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedMonth, setSelectedMonth] = useState(1);
+  const [selectedArea, setSelectedArea] = useState('TODAS');
 
-  const handleFilterChange = (filters: { 
-    year: number; 
-    month: number; 
-    equipment1: string;
-    equipment2: string;
-    equipment3: string;
-    area: string;
+  // Dados estáticos memoizados
+  const staticData = useMemo(() => ({
+    totalValue: 156789.50,
+    maintenanceCost: 23456.78,
+    energyCost: 34567.89,
+    availability: 98.5,
+    reliability: 95.2,
+    performance: 92.8,
+  }), []);
+
+  // Lista de equipamentos memoizada
+  const equipments = useMemo(() => {
+    return [
+      { id: '', name: 'Selecione...' },
+      ...inventory.equipment.map(eq => ({
+        id: eq.code,
+        name: eq.name
+      }))
+    ];
+  }, []);
+
+  // Função de filtro memoizada
+  const getAvailableEquipments = useCallback((equipmentNumber: 1 | 2 | 3) => {
+    const selectedEquipments = [
+      selectedFilters.equipment1,
+      selectedFilters.equipment2,
+      selectedFilters.equipment3
+    ];
+
+    const otherSelectedEquipments = selectedEquipments.filter((_, index) => 
+      index !== equipmentNumber - 1
+    );
+
+    return equipments.filter(eq => 
+      eq.id === '' || !otherSelectedEquipments.includes(eq.id)
+    );
+  }, [selectedFilters, equipments]);
+
+  // Função de mudança de filtro memoizada
+  const handleFilterChange = useCallback((filters: { 
+    year?: number; 
+    month?: number;
+    area?: string;
+    equipment1?: string;
+    equipment2?: string;
+    equipment3?: string;
   }) => {
-    setSelectedFilters(filters);
-    console.log('Filtros alterados:', filters);
-  };
+    if (filters.year !== undefined) setSelectedYear(filters.year);
+    if (filters.month !== undefined) setSelectedMonth(filters.month);
+    if (filters.area !== undefined) setSelectedArea(filters.area);
+    if (filters.equipment1 !== undefined || filters.equipment2 !== undefined || filters.equipment3 !== undefined) {
+      setSelectedFilters(prev => ({
+        ...prev,
+        ...(filters.equipment1 !== undefined && { equipment1: filters.equipment1 }),
+        ...(filters.equipment2 !== undefined && { equipment2: filters.equipment2 }),
+        ...(filters.equipment3 !== undefined && { equipment3: filters.equipment3 })
+      }));
+    }
+  }, []);
+
+  // Valores calculados memoizados
+  const calculatedValues = useMemo(() => {
+    const baseValue = staticData.totalValue;
+    const equipmentMultiplier = [selectedFilters.equipment1, selectedFilters.equipment2, selectedFilters.equipment3]
+      .filter(Boolean).length * 0.15;
+    
+    return {
+      totalValue: baseValue * (1 + equipmentMultiplier),
+      maintenanceCost: staticData.maintenanceCost * (1 + equipmentMultiplier),
+      energyCost: staticData.energyCost * (1 + equipmentMultiplier),
+      availability: staticData.availability,
+      reliability: staticData.reliability,
+      performance: staticData.performance
+    };
+  }, [selectedFilters, staticData]);
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Cabeçalho com título e filtros */}
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: 4,
-        mb: 4,
-        flexWrap: 'wrap'
-      }}>
-        <Typography 
-          variant="h4" 
-          component="h1" 
-          sx={{ 
-            fontWeight: 600,
-            minWidth: '200px'
-          }}
-        >
-          Dashboard PCM
-        </Typography>
+      <MaintenanceFilter
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        selectedArea={selectedArea}
+        selectedEquipment1={selectedFilters.equipment1}
+        selectedEquipment2={selectedFilters.equipment2}
+        selectedEquipment3={selectedFilters.equipment3}
+        onFilterChange={handleFilterChange}
+        getAvailableEquipments={getAvailableEquipments}
+      />
 
-        <Box sx={{ flex: 1 }}>
-          <MaintenanceFilter onFilterChange={handleFilterChange} />
-        </Box>
-      </Box>
-
-      <Grid container spacing={3}>
-        {/* Coluna dos Cards (60%) */}
-        <Grid item xs={12} md={7}>
-          {/* Primeira linha de cards */}
-          <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid item xs={12} sm={4}>
-              <MetricCard
-                title="OS Críticas"
-                value="5"
-                icon={<PendingIcon color="error" />}
-                subtitle="Necessitam atenção imediata"
-                info="Ordens de serviço com prioridade alta que precisam ser atendidas urgentemente"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <MetricCard
-                title="Total de OS em Aberto"
-                value="28"
-                icon={<AssignmentIcon />}
-                subtitle="Janeiro/2025"
-                info="Total de ordens de serviço abertas no mês atual"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <MetricCard
-                title="OS em Andamento"
-                value="12"
-                icon={<BuildIcon />}
-                subtitle="Em execução"
-                info="Ordens de serviço que estão sendo executadas no momento"
-              />
-            </Grid>
-          </Grid>
-
-          {/* Segunda linha de cards */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <MetricCard
-                title="Tempo de Inatividade"
-                value="24h"
-                icon={<TimerIcon />}
-                subtitle="Último período"
-                info="Tempo total em que os equipamentos ficaram inativos devido a falhas"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <MetricCard
-                title="MTBF"
-                value="120h"
-                icon={<SpeedIcon />}
-                subtitle="Tempo Médio entre Falhas"
-                info="Mean Time Between Failures - Média de tempo entre falhas dos equipamentos"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <MetricCard
-                title="MTTR"
-                value="4h"
-                icon={<UpdateIcon />}
-                subtitle="Tempo Médio de Reparo"
-                info="Mean Time To Repair - Tempo médio necessário para reparar um equipamento"
-              />
-            </Grid>
-          </Grid>
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Valor Total"
+            value={calculatedValues.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={<MonetizationOnIcon />}
+            progress={75}
+            subtitle="Últimos 30 dias"
+            info="Total gasto com manutenção no período"
+          />
         </Grid>
-
-        {/* Coluna do Gráfico (40%) */}
-        <Grid item xs={12} md={5}>
-          <Card sx={{ height: '100%', minHeight: 600 }}>
-            <CardContent>
-              <Typography variant="h6" component="h2" gutterBottom>
-                Custos por Área de Manutenção
-              </Typography>
-              
-              <Box sx={{ height: 'calc(100% - 60px)' }}>
-                <CostByEquipmentChart 
-                  selectedMonth={selectedFilters.month}
-                  equipment1={selectedFilters.equipment1 || null}
-                  equipment2={selectedFilters.equipment2 || null}
-                  equipment3={selectedFilters.equipment3 || null}
-                />
-              </Box>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Custo de Manutenção"
+            value={calculatedValues.maintenanceCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={<EngineeringIcon />}
+            progress={50}
+            subtitle="Últimos 30 dias"
+            info="Custo total com manutenção no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Custo de Energia"
+            value={calculatedValues.energyCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={<SpeedIcon />}
+            progress={25}
+            subtitle="Últimos 30 dias"
+            info="Custo total com energia no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Disponibilidade"
+            value={`${calculatedValues.availability}%`}
+            icon={<TimelineIcon />}
+            progress={calculatedValues.availability}
+            subtitle="Últimos 30 dias"
+            info="Disponibilidade dos equipamentos no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Confiabilidade"
+            value={`${calculatedValues.reliability}%`}
+            icon={<UpdateIcon />}
+            progress={calculatedValues.reliability}
+            subtitle="Últimos 30 dias"
+            info="Confiabilidade dos equipamentos no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Desempenho"
+            value={`${calculatedValues.performance}%`}
+            icon={<PendingIcon />}
+            progress={calculatedValues.performance}
+            subtitle="Últimos 30 dias"
+            info="Desempenho dos equipamentos no período"
+          />
         </Grid>
       </Grid>
     </Box>
