@@ -88,10 +88,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleTheme, isDarkMode }) => 
             </Badge>
           </IconButton>
 
-          <IconButton onClick={onToggleTheme} color="inherit">
-            {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-          </IconButton>
-
           <IconButton 
             onClick={handleOpenUserMenu} 
             sx={{ 
@@ -106,16 +102,26 @@ export const Header: React.FC<HeaderProps> = ({ onToggleTheme, isDarkMode }) => 
               sx={{ 
                 width: 32, 
                 height: 32,
+                bgcolor: theme.palette.secondary.main,
               }}
-            />
+            >
+              {user?.name?.charAt(0) || 'U'}
+            </Avatar>
           </IconButton>
 
-          <UserMenu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseUserMenu}
-          />
+          <IconButton 
+            onClick={onToggleTheme} 
+            color="inherit"
+            sx={{ ml: 1 }}
+          >
+            {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+          </IconButton>
         </Stack>
+
+        <UserMenu
+          anchorEl={anchorEl}
+          onClose={handleCloseUserMenu}
+        />
       </Toolbar>
     </AppBar>
   );
