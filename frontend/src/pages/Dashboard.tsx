@@ -1,231 +1,191 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
   Box,
-  LinearProgress,
-  IconButton,
-  Tooltip,
+  Grid,
+  Paper,
+  Typography,
 } from '@mui/material';
 import {
-  Build as BuildIcon,
-  Assignment as AssignmentIcon,
-  Timer as TimerIcon,
+  MonetizationOn as MonetizationOnIcon,
   Engineering as EngineeringIcon,
-  PendingActions as PendingIcon,
+  Speed as SpeedIcon,
   Timeline as TimelineIcon,
+  Update as UpdateIcon,
+  Pending as PendingIcon,
 } from '@mui/icons-material';
-import { useAppTheme } from '../contexts/ThemeContext';
-import { CostByEquipmentChart } from '../components/charts/CostByEquipmentChart';
+import { MetricCard } from '../components/MetricCard';
+import { MaintenanceFilter } from '../components/filters/MaintenanceFilter';
+import inventory from '../data/inventory.json';
 
-interface MetricCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  progress?: number;
-  subtitle?: string;
-  info?: string;
+interface Equipment {
+  code: string;
+  name: string;
+  type: string;
+  power: number | null;
+  sector: string;
+  manufacturingYear: number;
+  energyCostPerHour: number | null;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, icon, progress, subtitle, info }) => {
-  const { isDarkMode } = useAppTheme();
-
-  return (
-    <Card
-      sx={{
-        height: '100%',
-        backgroundColor: isDarkMode ? 'background.paper' : 'background.paper',
-        boxShadow: isDarkMode 
-          ? '0 4px 6px rgba(0, 0, 0, 0.3)' 
-          : '0 2px 4px rgba(0, 0, 0, 0.1)',
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: isDarkMode 
-            ? '0 6px 12px rgba(0, 0, 0, 0.4)' 
-            : '0 4px 8px rgba(0, 0, 0, 0.15)',
-        },
-      }}
-    >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              backgroundColor: isDarkMode ? 'rgba(144, 202, 249, 0.2)' : 'primary.light',
-              color: isDarkMode ? 'primary.light' : 'primary.dark',
-              mr: 1.5,
-            }}
-          >
-            {icon}
-          </Box>
-          <Typography 
-            variant="h6" 
-            component="div" 
-            sx={{ 
-              flexGrow: 1,
-              fontSize: '0.9rem',
-              fontWeight: 500,
-            }}
-          >
-            {title}
-          </Typography>
-          {info && (
-            <Tooltip title={info}>
-              <IconButton size="small">
-                <InfoIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-        
-        <Typography 
-          variant="h4" 
-          component="div"
-          sx={{ 
-            mb: 0.5,
-            fontWeight: 600,
-            color: isDarkMode ? 'primary.light' : 'primary.main',
-            fontSize: '1.75rem',
-          }}
-        >
-          {value}
-        </Typography>
-        
-        {subtitle && (
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ 
-              mb: 0.5,
-              fontSize: '0.8rem',
-            }}
-          >
-            {subtitle}
-          </Typography>
-        )}
-
-        {progress !== undefined && (
-          <Box sx={{ width: '100%', mt: 1.5 }}>
-            <LinearProgress 
-              variant="determinate" 
-              value={progress} 
-              sx={{
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 3,
-                },
-              }}
-            />
-          </Box>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
-
 export const Dashboard = () => {
+  const [selectedFilters, setSelectedFilters] = useState({
+    equipment1: '',
+    equipment2: '',
+    equipment3: '',
+  });
+  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedMonth, setSelectedMonth] = useState(1);
+  const [selectedArea, setSelectedArea] = useState('TODAS');
+
+  // Dados estáticos memoizados
+  const staticData = useMemo(() => ({
+    totalValue: 156789.50,
+    maintenanceCost: 23456.78,
+    energyCost: 34567.89,
+    availability: 98.5,
+    reliability: 95.2,
+    performance: 92.8,
+  }), []);
+
+  // Lista de equipamentos memoizada
+  const equipments = useMemo(() => {
+    return [
+      { id: '', name: 'Selecione...' },
+      ...inventory.equipment.map(eq => ({
+        id: eq.code,
+        name: eq.name
+      }))
+    ];
+  }, []);
+
+  // Função de filtro memoizada
+  const getAvailableEquipments = useCallback((equipmentNumber: 1 | 2 | 3) => {
+    const selectedEquipments = [
+      selectedFilters.equipment1,
+      selectedFilters.equipment2,
+      selectedFilters.equipment3
+    ];
+
+    const otherSelectedEquipments = selectedEquipments.filter((_, index) => 
+      index !== equipmentNumber - 1
+    );
+
+    return equipments.filter(eq => 
+      eq.id === '' || !otherSelectedEquipments.includes(eq.id)
+    );
+  }, [selectedFilters, equipments]);
+
+  // Função de mudança de filtro memoizada
+  const handleFilterChange = useCallback((filters: { 
+    year?: number; 
+    month?: number;
+    area?: string;
+    equipment1?: string;
+    equipment2?: string;
+    equipment3?: string;
+  }) => {
+    if (filters.year !== undefined) setSelectedYear(filters.year);
+    if (filters.month !== undefined) setSelectedMonth(filters.month);
+    if (filters.area !== undefined) setSelectedArea(filters.area);
+    if (filters.equipment1 !== undefined || filters.equipment2 !== undefined || filters.equipment3 !== undefined) {
+      setSelectedFilters(prev => ({
+        ...prev,
+        ...(filters.equipment1 !== undefined && { equipment1: filters.equipment1 }),
+        ...(filters.equipment2 !== undefined && { equipment2: filters.equipment2 }),
+        ...(filters.equipment3 !== undefined && { equipment3: filters.equipment3 })
+      }));
+    }
+  }, []);
+
+  // Valores calculados memoizados
+  const calculatedValues = useMemo(() => {
+    const baseValue = staticData.totalValue;
+    const equipmentMultiplier = [selectedFilters.equipment1, selectedFilters.equipment2, selectedFilters.equipment3]
+      .filter(Boolean).length * 0.15;
+    
+    return {
+      totalValue: baseValue * (1 + equipmentMultiplier),
+      maintenanceCost: staticData.maintenanceCost * (1 + equipmentMultiplier),
+      energyCost: staticData.energyCost * (1 + equipmentMultiplier),
+      availability: staticData.availability,
+      reliability: staticData.reliability,
+      performance: staticData.performance
+    };
+  }, [selectedFilters, staticData]);
+
   return (
     <Box sx={{ p: 3 }}>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        sx={{ 
-          mb: 4,
-          fontWeight: 600,
-        }}
-      >
-        Dashboard PCM
-      </Typography>
+      <MaintenanceFilter
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        selectedArea={selectedArea}
+        selectedEquipment1={selectedFilters.equipment1}
+        selectedEquipment2={selectedFilters.equipment2}
+        selectedEquipment3={selectedFilters.equipment3}
+        onFilterChange={handleFilterChange}
+        getAvailableEquipments={getAvailableEquipments}
+      />
 
-      <Grid container spacing={3}>
-        {/* Cards de Métricas */}
-        <Grid item xs={12}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="Equipamentos"
-                value="156"
-                icon={<BuildIcon />}
-                subtitle="Total de equipamentos"
-                info="Número total de equipamentos cadastrados no sistema"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="OS em Andamento"
-                value="28"
-                icon={<AssignmentIcon />}
-                subtitle="Ordens de serviço ativas"
-                info="Número de ordens de serviço em execução"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="MTBF"
-                value="120h"
-                icon={<TimerIcon />}
-                subtitle="Tempo médio entre falhas"
-                info="Mean Time Between Failures - Média de tempo entre falhas dos equipamentos"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="Técnicos Disponíveis"
-                value="12"
-                icon={<EngineeringIcon />}
-                subtitle="Equipe técnica ativa"
-                info="Número de técnicos disponíveis para manutenção"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="Manutenções Pendentes"
-                value="15"
-                icon={<PendingIcon />}
-                subtitle="Aguardando execução"
-                info="Número de manutenções programadas aguardando execução"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="Eficiência Geral"
-                value="85%"
-                icon={<TimelineIcon />}
-                progress={85}
-                subtitle="OEE do mês atual"
-                info="Overall Equipment Effectiveness - Eficiência geral dos equipamentos"
-              />
-            </Grid>
-          </Grid>
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Valor Total"
+            value={calculatedValues.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={<MonetizationOnIcon />}
+            progress={75}
+            subtitle="Últimos 30 dias"
+            info="Total gasto com manutenção no período"
+          />
         </Grid>
-
-        {/* Gráfico de Custos */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" component="h2" gutterBottom>
-                Custos por Equipamento
-              </Typography>
-              <Box sx={{ height: 300 }}>
-                <CostByEquipmentChart />
-              </Box>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Custo de Manutenção"
+            value={calculatedValues.maintenanceCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={<EngineeringIcon />}
+            progress={50}
+            subtitle="Últimos 30 dias"
+            info="Custo total com manutenção no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Custo de Energia"
+            value={calculatedValues.energyCost.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={<SpeedIcon />}
+            progress={25}
+            subtitle="Últimos 30 dias"
+            info="Custo total com energia no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Disponibilidade"
+            value={`${calculatedValues.availability}%`}
+            icon={<TimelineIcon />}
+            progress={calculatedValues.availability}
+            subtitle="Últimos 30 dias"
+            info="Disponibilidade dos equipamentos no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Confiabilidade"
+            value={`${calculatedValues.reliability}%`}
+            icon={<UpdateIcon />}
+            progress={calculatedValues.reliability}
+            subtitle="Últimos 30 dias"
+            info="Confiabilidade dos equipamentos no período"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Desempenho"
+            value={`${calculatedValues.performance}%`}
+            icon={<PendingIcon />}
+            progress={calculatedValues.performance}
+            subtitle="Últimos 30 dias"
+            info="Desempenho dos equipamentos no período"
+          />
         </Grid>
       </Grid>
     </Box>

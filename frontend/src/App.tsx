@@ -23,6 +23,8 @@ function AppWithProviders() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/ordens-servico" element={<OrdensServico />} />
+              <Route path="/solicitacoes" element={<div>Página de Solicitações em desenvolvimento</div>} />
+              <Route path="/planos" element={<div>Página de Planos em desenvolvimento</div>} />
               <Route path="/inventario" element={<Inventario />} />
               <Route path="/metricas/falhas" element={<Falhas />} />
               <Route path="/metricas/tempo" element={<Tempo />} />

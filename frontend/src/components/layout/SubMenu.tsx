@@ -50,12 +50,13 @@ export const SubMenu = () => {
           },
           '&::-webkit-scrollbar-track': {
             backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+            borderRadius: '3px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
             borderRadius: '3px',
             '&:hover': {
-              backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+              backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
             },
           },
           pb: 1, // Espaço para a scrollbar
@@ -63,30 +64,23 @@ export const SubMenu = () => {
       >
         {menuItems.map((item) => (
           <Button
-            key={item.text}
+            key={item.path}
             startIcon={item.icon}
             onClick={() => navigate(item.path)}
-            size="small"
+            variant={location.pathname === item.path ? 'contained' : 'text'}
             sx={{
-              color: location.pathname === item.path 
-                ? 'primary.main' 
-                : isDarkMode ? 'text.secondary' : 'text.primary',
-              backgroundColor: location.pathname === item.path 
-                ? (isDarkMode ? 'rgba(144, 202, 249, 0.08)' : 'rgba(25, 118, 210, 0.08)')
-                : 'transparent',
-              '&:hover': {
-                backgroundColor: isDarkMode 
-                  ? 'rgba(144, 202, 249, 0.12)' 
-                  : 'rgba(25, 118, 210, 0.12)',
-              },
+              minWidth: 'auto',
               whiteSpace: 'nowrap',
-              px: 2,
+              px: { xs: 1, sm: 2 },
               py: 1,
-              minHeight: 40,
-              borderRadius: 1,
-              fontSize: { xs: '0.875rem', sm: '0.9rem' },
-              textTransform: 'none',
-              transition: 'all 0.2s',
+              color: location.pathname === item.path 
+                ? 'primary.contrastText'
+                : (isDarkMode ? 'text.primary' : 'text.secondary'),
+              '&:hover': {
+                backgroundColor: location.pathname === item.path
+                  ? 'primary.dark'
+                  : (isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)'),
+              },
             }}
           >
             {item.text}
